@@ -2,7 +2,8 @@
 
 A production-ready client & admin dashboard for an early-stage SaaS product,
 built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and
-**Supabase** (PostgreSQL + Auth).
+**PostgreSQL** — fully self-hosted, with a custom authentication layer. The
+whole stack runs in **Docker Compose**.
 
 > **Status:** Stage 1 complete — project setup, authentication and database.
 > Stages 2 (client/admin panel features) and 3 (testing, deploy, polish) follow.
@@ -15,13 +16,9 @@ built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and
 - [Tech stack](#tech-stack)
 - [Architecture overview](#architecture-overview)
 - [Project structure](#project-structure)
-- [Getting started (local development)](#getting-started-local-development)
-  - [1. Prerequisites](#1-prerequisites)
-  - [2. Install dependencies](#2-install-dependencies)
-  - [3. Configure environment variables](#3-configure-environment-variables)
-  - [4. Set up the database](#4-set-up-the-database)
-  - [5. Create your first (admin) user](#5-create-your-first-admin-user)
-  - [6. Run the app](#6-run-the-app)
+- [Quick start (Docker)](#quick-start-docker)
+- [Local development (without Docker)](#local-development-without-docker)
+- [Environment variables](#environment-variables)
 - [Database](#database)
 - [Authentication & authorization](#authentication--authorization)
 - [Route map](#route-map)
@@ -33,11 +30,10 @@ built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and
 
 ## Features (Stage 1)
 
-- **Authentication**
-  - Email/password **registration** (with server-side validation)
-  - **Sign in / sign out**
-  - **Password reset** via email link (forgot → email → set new password)
-  - **Email confirmation** flow (optional, configurable in Supabase)
+- **Authentication** (custom, self-hosted)
+  - Email/password **registration** (server-side validation, bcrypt hashing)
+  - **Sign in / sign out** (signed JWT session in an HTTP-only cookie)
+  - **Password reset** via single-use, time-limited tokens
 - **Authorization**
   - Role-based access control (`client` / `admin`)
   - **Protected routes** enforced in middleware **and** on the server
@@ -52,65 +48,63 @@ built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and
   - Loading, error and empty states
   - Accessible form fields (labels, `aria-*`, focus rings, skip link)
 - **Database**
-  - Versioned SQL migrations with Row Level Security
-  - Auto-created profiles via database trigger
-  - Privilege-escalation guard on the `role` column
+  - Versioned SQL schema applied automatically in Docker
+  - Enforced constraints, indexes and updated-at triggers
 
 ---
 
 ## Tech stack
 
-| Layer         | Choice                                    |
-| ------------- | ----------------------------------------- |
-| Framework     | Next.js 14 (App Router, Server Actions)   |
-| Language      | TypeScript (strict)                       |
-| UI            | React 18 + Tailwind CSS                   |
-| Database      | PostgreSQL via Supabase                   |
-| Auth          | Supabase Auth (`@supabase/ssr`)           |
-| Validation    | Zod (shared client + server schemas)      |
-| Deployment    | Vercel (recommended) or AWS                |
-| Version control | Git / GitHub                            |
+| Layer           | Choice                                      |
+| --------------- | ------------------------------------------- |
+| Framework       | Next.js 14 (App Router, Server Actions)     |
+| Language        | TypeScript (strict)                         |
+| UI              | React 18 + Tailwind CSS                     |
+| Database        | PostgreSQL 16 (`pg` driver)                 |
+| Auth            | Custom JWT sessions (`jose`) + `bcryptjs`   |
+| Validation      | Zod (shared client + server schemas)        |
+| Containerisation| Docker + Docker Compose                     |
+| Version control | Git / GitHub                                |
 
 ---
 
 ## Architecture overview
 
-The app follows a **layered** structure so that concerns stay separated and a
-new developer can navigate it quickly:
+The app follows a **layered** structure so concerns stay separated:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  app/  (Routing & rendering)                                 │
-│  RSC pages, Server Actions, route handlers                   │
+│  RSC pages, Server Actions, REST route handlers (/api)        │
 ├──────────────────────────────────────────────────────────────┤
 │  components/  (Presentation)                                 │
-│  Reusable UI + feature components ("use client" only where    │
-│  interactivity is required)                                  │
+│  Reusable UI + feature components ("use client" where needed) │
 ├──────────────────────────────────────────────────────────────┤
 │  lib/  (Domain & infrastructure)                             │
-│  auth guards, Supabase clients, env config, validation, utils │
+│  auth (session/password), db (queries), env, validation, utils│
 └──────────────────────────────────────────────────────────────┘
         │                              │
         ▼                              ▼
-   Supabase Auth                 Supabase Postgres
-                                   (RLS policies)
+   JWT session cookie           PostgreSQL (pg pool)
 ```
 
 **Key decisions**
 
-- **Server-first.** Pages are React Server Components by default; the Supabase
-  session lives in HTTP-only cookies, so tokens are never exposed to JS.
+- **Server-first.** Pages are React Server Components by default; data access
+  happens on the server via the `pg` connection pool. No DB credentials ever
+  reach the browser.
 - **Defense in depth.** Route protection happens in `middleware.ts` *and* in
-  server-side guards (`requireUser` / `requireAdmin`). Middleware is a fast UX
-  layer; the server guard is the real boundary. RLS is the final backstop.
-- **Three Supabase clients**, each with a narrow purpose:
-  - `client.ts` — browser, anon key (RLS applies)
-  - `server.ts` — request-scoped, cookie-based (RLS applies)
-  - `admin.ts` — service role, server-only, bypasses RLS (trusted code only)
+  server-side guards (`requireUser` / `requireAdmin`). Middleware verifies the
+  JWT (Edge-safe); the server guard is the authoritative check.
+- **Edge-safe session.** `lib/auth/session.ts` uses only `jose`, so middleware
+  can verify tokens without Node-only APIs. Node-only helpers (reset tokens,
+  bcrypt) live in separate modules (`lib/auth/tokens.ts`, `lib/auth/password.ts`).
+- **Data-access layer.** All SQL lives in `lib/db/*` behind typed functions,
+  using parameterised queries (no string-built SQL).
 - **Validation once.** Zod schemas in `lib/validation` are reused by both the
-  form and the Server Action, so the server never trusts the client.
+  form and the Server Action / API route, so the server never trusts the client.
 - **Lazy env validation.** `lib/env.ts` validates on first use, not at import
-  time, so builds don't require secrets to be present during static analysis.
+  time, so builds don't require secrets during static analysis.
 
 ---
 
@@ -122,24 +116,18 @@ new developer can navigate it quickly:
 │   ├── app/
 │   │   ├── (auth)/                 # Auth route group (public)
 │   │   │   ├── actions.ts          # Server Actions: signup/in/out/reset
-│   │   │   ├── layout.tsx
 │   │   │   ├── login/page.tsx
 │   │   │   ├── register/page.tsx
 │   │   │   ├── forgot-password/page.tsx
 │   │   │   └── reset-password/page.tsx
 │   │   ├── admin/                  # Admin area (role-guarded)
-│   │   │   ├── layout.tsx
-│   │   │   └── page.tsx
-│   │   ├── auth/
-│   │   │   ├── callback/route.ts   # Email confirm / password reset callback
-│   │   │   └── signout/route.ts    # POST sign-out
+│   │   ├── api/auth/               # REST auth endpoints
+│   │   │   ├── register/route.ts
+│   │   │   ├── login/route.ts
+│   │   │   ├── logout/route.ts
+│   │   │   ├── forgot-password/route.ts
+│   │   │   └── reset-password/route.ts
 │   │   ├── dashboard/              # Client dashboard (auth-guarded)
-│   │   │   ├── layout.tsx
-│   │   │   ├── page.tsx
-│   │   │   ├── profile/page.tsx
-│   │   │   ├── loading.tsx
-│   │   │   └── error.tsx
-│   │   ├── globals.css
 │   │   ├── layout.tsx              # Root layout
 │   │   ├── page.tsx                # Public landing
 │   │   └── not-found.tsx
@@ -148,138 +136,163 @@ new developer can navigate it quickly:
 │   │   ├── dashboard/              # App header, etc.
 │   │   └── ui/                     # Primitives: Button, Input, Alert, ...
 │   ├── lib/
-│   │   ├── auth.ts                 # Server-side guards (requireUser/Admin)
+│   │   ├── auth/
+│   │   │   ├── session.ts          # JWT create/verify (Edge-safe)
+│   │   │   ├── password.ts         # bcrypt hash/verify (server-only)
+│   │   │   └── tokens.ts           # reset tokens (server-only)
+│   │   ├── db/
+│   │   │   ├── users.ts            # profile + credential queries
+│   │   │   ├── activity.ts         # activity log queries
+│   │   │   └── password-reset.ts   # reset-token persistence
+│   │   ├── db.ts                   # pg pool + query helpers
+│   │   ├── auth.ts                 # Server guards (requireUser/Admin)
 │   │   ├── env.ts                  # Validated environment config
 │   │   ├── form-state.ts           # Shared Server Action state types
-│   │   ├── utils.ts                # cn(), formatDate(), initials()
-│   │   ├── validation/auth.ts      # Zod schemas
-│   │   └── supabase/               # client / server / middleware / admin
-│   ├── types/database.types.ts     # DB types (regenerate with npm run gen:types)
-│   └── middleware.ts               # Route protection + session refresh
-├── supabase/
-│   ├── config.toml                 # Local Supabase config
-│   ├── migrations/                 # Versioned SQL migrations
-│   └── seed.sql                    # Local dev seed data
-├── docs/                           # Database & architecture docs
-├── .env.example                    # Environment template (copy to .env.local)
-├── package.json
-└── README.md
+│   │   ├── utils.ts
+│   │   └── validation/auth.ts      # Zod schemas
+│   ├── types/database.types.ts     # DB row types
+│   └── middleware.ts               # Route protection (Edge)
+├── db/init/                        # SQL applied on first DB start
+│   ├── 001_schema.sql
+│   └── 002_seed.sql
+├── scripts/
+│   ├── migrate.ts                  # Apply schema to an existing DB
+│   └── seed.ts                     # Apply demo data
+├── Dockerfile                      # Multi-stage production image
+├── docker-compose.yml              # db + app
+└── docs/
+    ├── database.md
+    └── technical-report.md
 ```
 
 ---
 
-## Getting started (local development)
+## Quick start (Docker)
 
-### 1. Prerequisites
+**Prerequisites:** Docker Desktop (or Docker Engine + Compose v2).
 
-- **Node.js ≥ 18.18** (see `engines` in `package.json`)
-- **npm** (or pnpm/yarn — swap commands accordingly)
-- **Docker Desktop** — required by the Supabase CLI for local development
-- **(Optional)** the [Supabase CLI](https://supabase.com/docs/guides/cli) — it
-  is also installed locally as a dev dependency, so `npx supabase ...` works.
+```bash
+# Build and start the whole stack (database + app)
+docker compose up --build
 
-### 2. Install dependencies
+# Then open http://localhost:3000
+```
+
+That's it — the database schema and demo data are applied automatically on the
+first run.
+
+### Demo accounts
+
+| Email                | Password    | Role   |
+| -------------------- | ----------- | ------ |
+| `admin@example.com`  | `Admin1234` | admin  |
+| `client@example.com` | `Client1234`| client |
+
+> These are **development** credentials from `db/init/002_seed.sql`. Never ship
+> them to production.
+
+### Common Docker commands
+
+```bash
+docker compose up --build      # start (rebuild images)
+docker compose up -d           # start in the background
+docker compose logs -f app     # tail app logs
+docker compose down            # stop
+docker compose down -v         # stop AND wipe the database volume
+```
+
+> **Re-running the schema/seed:** the SQL in `db/init/` only runs on the *first*
+> initialisation of an empty data directory. After changing it, run
+> `docker compose down -v && docker compose up --build`.
+
+---
+
+## Local development (without Docker)
+
+You can also run the app on the host against the Dockerised database.
 
 ```bash
 npm install
+
+# Start only the database
+docker compose up -d db
+
+# Point the app at it
+cp .env.example .env.local       # if present, otherwise create it (see below)
+npm run dev                      # http://localhost:3000
 ```
 
-### 3. Configure environment variables
+`.env.local` for local development:
 
-Copy the template and fill in your values:
-
-```bash
-cp .env.example .env.local
+```dotenv
+DATABASE_URL=postgresql://app:app_password@localhost:5432/saas_dashboard
+JWT_SECRET=dev-secret-please-change-in-prod-at-least-32-chars-long
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-| Variable                        | Scope   | Description                                              |
-| ------------------------------- | ------- | -------------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`      | Public  | Your Supabase project URL                                |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public  | Supabase **anon** key (safe in the browser, RLS-guarded) |
-| `NEXT_PUBLIC_SITE_URL`          | Public  | Base URL, used for auth email redirects                  |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Secret  | Service role key — **server only**, bypasses RLS         |
+---
 
-> **Two ways to get these values**
->
-> - **Local Supabase** (recommended for development): run `npm run db:start`
->   and the CLI prints the local URL and keys. Use those.
-> - **Hosted Supabase**: create a project at
->   [supabase.com](https://supabase.com), then read the values from
->   **Project Settings → API**.
+## Environment variables
 
-Never commit `.env.local` — it is already git-ignored.
+| Variable               | Scope  | Description                                                       |
+| ---------------------- | ------ | ----------------------------------------------------------------- |
+| `DATABASE_URL`         | Server | PostgreSQL connection string                                       |
+| `JWT_SECRET`           | Server | Secret for signing session JWTs — **≥ 32 characters**             |
+| `NEXT_PUBLIC_SITE_URL` | Public | Base URL, used for links/redirects (e.g. password-reset URL)      |
 
-### 4. Set up the database
+In Docker Compose these are set in `docker-compose.yml`. For any real
+deployment, override `JWT_SECRET` (and the DB credentials) via your platform's
+secret store or a `.env` file.
 
-**Option A — Local (Docker):**
-
-```bash
-npm run db:start     # start local Postgres + Auth + Studio
-npm run db:reset     # apply migrations + seed
-```
-
-Studio is then available at http://localhost:54323, and auth emails are
-captured by Inbucket at http://localhost:54324.
-
-**Option B — Hosted Supabase:**
-
-```bash
-npx supabase link --project-ref <your-project-ref>
-npm run db:push      # apply migrations to the hosted database
-```
-
-### 5. Create your first (admin) user
-
-1. Start the app and go to `/register` to create an account.
-2. Promote it to admin (local DB example):
-
-   ```bash
-   # Local
-   npx supabase db execute --local \
-     --sql "update public.profiles set role='admin' where email='you@example.com';"
-   ```
-
-   Or run the same SQL in the **SQL editor** of the hosted dashboard.
-
-### 6. Run the app
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000.
+> **Note:** `.env.example` is referenced above, but if it is not present simply
+> create `.env.local` with the three variables shown in the previous section.
 
 ---
 
 ## Database
 
 See **[docs/database.md](docs/database.md)** for the full schema, ER diagram,
-migration workflow and RLS policy reference.
+migration workflow and reference.
 
-Quick summary of the tables:
+Tables:
 
-| Table           | Purpose                                              |
-| --------------- | ---------------------------------------------------- |
-| `profiles`      | App user data, 1:1 with `auth.users`; holds `role`   |
-| `activity_logs` | Basic user activity history                          |
+| Table                   | Purpose                                            |
+| ----------------------- | -------------------------------------------------- |
+| `profiles`              | User accounts + credentials (bcrypt hashes) + role |
+| `activity_logs`         | Basic user activity history                        |
+| `password_reset_tokens` | Single-use, hashed, time-limited reset tokens      |
+
+Apply schema changes to an existing database:
+
+```bash
+npm run db:migrate   # applies every db/init/*.sql in order
+npm run db:seed      # applies the demo data
+```
 
 ---
 
 ## Authentication & authorization
 
-- **Session storage:** Supabase cookies managed by `@supabase/ssr`. The
-  middleware refreshes the session on every request so users are never logged
-  out mid-session.
-- **Sign up:** `signUpAction` → Supabase Auth → trigger creates a `profiles`
-  row automatically.
-- **Sign in:** `signInAction` → on success redirects to the requested page
-  (validated against open redirects).
-- **Password reset:** `forgotPasswordAction` sends an email whose link points
-  to `/auth/callback?next=/reset-password`; the callback exchanges the code for
-  a session, then `/reset-password` lets the user set a new password.
+- **Passwords** are hashed with bcrypt (cost 12); plaintext is never stored.
+- **Sessions** are signed JWTs (`HS256`) stored in an HTTP-only, SameSite=Lax
+  cookie, valid for 7 days. The token carries the user id and role.
+- **Sign up / sign in** issue the session cookie; **sign out** clears it.
+- **Password reset:** `/api/auth/forgot-password` creates a single-use token
+  (only its SHA-256 hash is stored). The link lands on
+  `/reset-password?token=…`, which validates and consumes the token.
 - **Protected routes:**
   - `/dashboard/*` → any authenticated user
   - `/admin/*` → authenticated user with `role = admin`
+
+### REST auth endpoints
+
+| Method | Path                          | Purpose                     |
+| ------ | ----------------------------- | --------------------------- |
+| POST   | `/api/auth/register`          | Create account + sign in    |
+| POST   | `/api/auth/login`             | Sign in                     |
+| POST   | `/api/auth/logout`            | Sign out                    |
+| POST   | `/api/auth/forgot-password`   | Request a reset link        |
+| POST   | `/api/auth/reset-password`    | Complete a password reset   |
 
 ---
 
@@ -291,9 +304,7 @@ Quick summary of the tables:
 | `/login`             | Public        | Sign in                              |
 | `/register`          | Public        | Create account                       |
 | `/forgot-password`   | Public        | Request reset link                   |
-| `/reset-password`    | Recovery sess.| Set a new password                   |
-| `/auth/callback`     | Public        | Email confirmation / recovery code   |
-| `/auth/signout`      | POST          | Sign out                             |
+| `/reset-password`    | Public (token)| Set a new password                   |
 | `/dashboard`         | Authenticated | Client dashboard                     |
 | `/dashboard/profile` | Authenticated | Profile view                         |
 | `/admin`             | Admin         | Admin area (features land in Stage 2)|
@@ -302,30 +313,21 @@ Quick summary of the tables:
 
 ## Deployment
 
-Recommended target: **Vercel** (zero-config for Next.js). Any Node host also
-works (AWS, Render, Fly.io, ...).
+The `Dockerfile` produces a small, non-root, standalone Next.js image. Any
+container host works (AWS ECS/Fargate, Fly.io, Render, a VPS, ...).
 
-### Vercel
+1. Build and push the image:
+   ```bash
+   docker build -t your-registry/saas-dashboard:latest .
+   docker push your-registry/saas-dashboard:latest
+   ```
+2. Provide `DATABASE_URL`, `JWT_SECRET` and `NEXT_PUBLIC_SITE_URL` as
+   environment variables/secrets.
+3. Point the app at a managed PostgreSQL instance.
+4. Run the container exposing port `3000` behind a TLS-terminating proxy.
 
-1. Push the repository to GitHub.
-2. Import the project in Vercel.
-3. Add the environment variables from the table above in
-   **Project → Settings → Environment Variables**. Set
-   `NEXT_PUBLIC_SITE_URL` to your production URL (e.g.
-   `https://your-app.vercel.app`).
-4. Deploy.
-
-### Supabase (production)
-
-1. Create a hosted Supabase project.
-2. Apply migrations: `npx supabase link --project-ref <ref> && npm run db:push`.
-3. In **Authentication → URL Configuration**, add your production URL to
-   *Site URL* and *Redirect URLs* (include `/auth/callback`).
-
-### AWS (alternative)
-
-Deploy as a container or via the [OpenNext](https://opennext.js.org/) adapter
-to Lambda + CloudFront. The environment variable requirements are identical.
+> For a managed database, apply the schema with `npm run db:migrate` (set
+> `DATABASE_URL` to the managed instance) before first start.
 
 ---
 
@@ -334,16 +336,13 @@ to Lambda + CloudFront. The environment variable requirements are identical.
 | Script              | Description                                  |
 | ------------------- | -------------------------------------------- |
 | `npm run dev`       | Start the dev server                          |
-| `npm run build`     | Production build                              |
+| `npm run build`     | Production build (standalone output)          |
 | `npm run start`     | Run the production build                      |
 | `npm run lint`      | ESLint                                        |
 | `npm run typecheck` | TypeScript type-check (`tsc --noEmit`)        |
 | `npm run format`    | Prettier                                      |
-| `npm run db:start`  | Start local Supabase                          |
-| `npm run db:stop`   | Stop local Supabase                           |
-| `npm run db:reset`  | Reset local DB (re-run migrations + seed)     |
-| `npm run db:push`   | Push migrations to a linked hosted project    |
-| `npm run gen:types` | Regenerate `src/types/database.types.ts`      |
+| `npm run db:migrate`| Apply `db/init/*.sql` to `DATABASE_URL`       |
+| `npm run db:seed`   | Apply demo data                               |
 
 ---
 

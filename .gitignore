@@ -30,6 +30,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# supabase
-/supabase/.branches
-/supabase/.temp
+# docker / local database
+/db/data
+docker-compose.override.yml
+
