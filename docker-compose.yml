@@ -1,0 +1,60 @@
+# ============================================================================
+# docker-compose.yml — full local stack
+#
+#   db   : PostgreSQL 16 with the application schema + seed applied on first run
+#   app  : the Next.js application
+#
+# Usage:
+#   docker compose up --build      # start everything
+#   docker compose down            # stop
+#   docker compose down -v         # stop AND wipe the database volume
+#
+# The app is available at http://localhost:3000
+# The database is exposed on localhost:5432 for inspection.
+# ============================================================================
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: saas-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: saas_dashboard
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      # SQL files here run, in name order, ONLY on first initialisation of an
+      # empty data directory. To re-run them after changing the schema, use
+      # `docker compose down -v` first.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d saas_dashboard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: saas-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      # Server-only secrets
+      DATABASE_URL: postgresql://app:app_password@db:5432/saas_dashboard
+      # NOTE: override JWT_SECRET in any real deployment.
+      JWT_SECRET: change-me-to-a-long-random-string-of-at-least-32-chars
+      # Public configuration
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+
+volumes:
+  db_data:
