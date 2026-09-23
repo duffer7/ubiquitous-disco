@@ -7,24 +7,24 @@ export function ActivityList({ items }: { items: ActivityLog[] }) {
   const t = getMessages();
 
   return (
-    <ol className="relative space-y-6 border-l border-slate-200 pl-6">
+    <ol className="relative space-y-6 border-l border-surface-muted pl-6">
       {items.map((log) => (
         <li key={log.id} className="relative">
           <span
             aria-hidden
-            className="absolute -left-[1.9rem] top-1 h-3 w-3 rounded-full border-2 border-white bg-brand-500"
+            className="absolute -left-[1.9rem] top-1 h-3 w-3 rounded-full border-2 border-surface bg-brand-500"
           />
-          <p className="text-sm font-medium text-slate-800">
+          <p className="text-sm font-medium text-zinc-100">
             {humanizeAction(log.action, t.activityActions)}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-zinc-400">
             <time dateTime={log.created_at} title={formatDate(log.created_at)}>
               {formatRelative(log.created_at)}
             </time>
             {log.ip_address && (
               <>
                 {" · "}
-                <span className="font-mono text-slate-400">{log.ip_address}</span>
+                <span className="font-mono text-zinc-500">{log.ip_address}</span>
               </>
             )}
           </p>

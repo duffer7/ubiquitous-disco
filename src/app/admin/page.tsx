@@ -10,7 +10,7 @@ import { formatRelative, humanizeAction } from "@/lib/utils";
 import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
-export const metadata: Metadata = { title: t.metadata.admin };
+export const metadata: Metadata = { title: t.metadata.admin, description: t.metadata.descriptionAdmin };
 
 /** Admin overview: aggregate user statistics + recent platform activity. */
 export default async function AdminPage() {
@@ -24,8 +24,8 @@ export default async function AdminPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{t.admin.overviewTitle}</h1>
-          <p className="mt-1 text-sm text-slate-500">{t.admin.overviewSubtitle}</p>
+          <h1 className="text-2xl font-semibold text-zinc-50">{t.admin.overviewTitle}</h1>
+          <p className="mt-1 text-sm text-zinc-400">{t.admin.overviewSubtitle}</p>
         </div>
         <Link href="/admin/users" className="btn-primary">
           {t.admin.manageUsers}
@@ -56,27 +56,27 @@ export default async function AdminPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Newest users */}
         <section className="card">
-          <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">{t.admin.newestUsers}</h2>
-            <Link href="/admin/users" className="text-xs font-medium text-brand-600 hover:underline">
+          <div className="flex items-center justify-between border-b border-surface-muted px-6 py-4">
+            <h2 className="text-sm font-semibold text-zinc-50">{t.admin.newestUsers}</h2>
+            <Link href="/admin/users" className="text-xs font-medium text-brand-400 hover:underline">
               {t.admin.viewAll}
             </Link>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-surface-muted">
             {recentUsers.items.length === 0 ? (
-              <li className="px-6 py-6 text-sm text-slate-500">{t.admin.noUsersYet}</li>
+              <li className="px-6 py-6 text-sm text-zinc-400">{t.admin.noUsersYet}</li>
             ) : (
               recentUsers.items.map((user) => (
                 <li key={user.id}>
                   <Link
                     href={`/admin/users/${user.id}` as Route}
-                    className="flex items-center justify-between gap-4 px-6 py-3 hover:bg-slate-50"
+                    className="flex items-center justify-between gap-4 px-6 py-3 hover:bg-surface"
                   >
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-slate-800">
+                      <p className="truncate text-sm font-medium text-zinc-100">
                         {user.full_name || user.email}
                       </p>
-                      <p className="truncate text-xs text-slate-500">{user.email}</p>
+                      <p className="truncate text-xs text-zinc-400">{user.email}</p>
                     </div>
                     <RoleBadge role={user.role} />
                   </Link>
@@ -88,19 +88,19 @@ export default async function AdminPage() {
 
         {/* Recent platform activity */}
         <section className="card">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">
+          <div className="border-b border-surface-muted px-6 py-4">
+            <h2 className="text-sm font-semibold text-zinc-50">
               {t.admin.recentPlatformActivity}
             </h2>
           </div>
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-surface-muted">
             {recentActivity.items.length === 0 ? (
-              <li className="px-6 py-6 text-sm text-slate-500">{t.admin.noActivityYet}</li>
+              <li className="px-6 py-6 text-sm text-zinc-400">{t.admin.noActivityYet}</li>
             ) : (
               recentActivity.items.map((log) => (
                 <li key={log.id} className="flex items-center justify-between gap-4 px-6 py-3">
                   <Badge>{humanizeAction(log.action, t.activityActions)}</Badge>
-                  <span className="text-xs text-slate-500">{formatRelative(log.created_at)}</span>
+                  <span className="text-xs text-zinc-400">{formatRelative(log.created_at)}</span>
                 </li>
               ))
             )}

@@ -5,11 +5,11 @@ import { cn } from "@/lib/utils";
 type BadgeVariant = "neutral" | "brand" | "success" | "warning" | "danger";
 
 const styles: Record<BadgeVariant, string> = {
-  neutral: "bg-slate-100 text-slate-700",
-  brand: "bg-brand-100 text-brand-700",
-  success: "bg-green-100 text-green-700",
-  warning: "bg-amber-100 text-amber-700",
-  danger: "bg-red-100 text-red-700",
+  neutral: "bg-surface-muted text-zinc-300",
+  brand: "bg-brand-600/20 text-brand-300",
+  success: "bg-green-500/15 text-green-400",
+  warning: "bg-amber-500/15 text-amber-400",
+  danger: "bg-red-500/15 text-red-400",
 };
 
 export function Badge({
@@ -43,4 +43,3 @@ export function RoleBadge({ role }: { role: "client" | "admin" }) {
     </Badge>
   );
 }
-

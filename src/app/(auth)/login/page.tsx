@@ -8,7 +8,7 @@ import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
 
-export const metadata: Metadata = { title: t.metadata.signIn };
+export const metadata: Metadata = { title: t.metadata.signIn, description: t.metadata.descriptionSignIn };
 
 export default function LoginPage({
   searchParams,

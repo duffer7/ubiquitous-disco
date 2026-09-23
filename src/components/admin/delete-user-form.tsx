@@ -39,7 +39,7 @@ export function DeleteUserForm({ userId, email }: { userId: string; email: strin
       ) : (
         <form action={formAction} className="space-y-3">
           <input type="hidden" name="id" value={userId} />
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-zinc-300">
             {t.admin.deleteConfirmPrefix} <span className="font-medium">{email}</span>{" "}
             {t.admin.deleteConfirmSuffix}
           </p>

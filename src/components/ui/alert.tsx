@@ -3,9 +3,9 @@ import { cn } from "@/lib/utils";
 type AlertVariant = "success" | "error" | "info";
 
 const styles: Record<AlertVariant, string> = {
-  success: "border-green-200 bg-green-50 text-green-800",
-  error: "border-red-200 bg-red-50 text-red-800",
-  info: "border-brand-200 bg-brand-50 text-brand-800",
+  success: "border-green-500/30 bg-green-500/10 text-green-300",
+  error: "border-red-500/30 bg-red-500/10 text-red-300",
+  info: "border-brand-500/30 bg-brand-500/10 text-brand-200",
 };
 
 export function Alert({

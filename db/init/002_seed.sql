@@ -16,14 +16,14 @@ values
     'admin@example.com',
     '$2a$12$dXggbAh3K5LFEhTZJTENBeklMBZCymxAbDDo1BP6tLSt3TZWjgTYm',
     'Ada Admin',
-    'Acme Inc.',
+    'Orbit HQ',
     'admin'
   ),
   (
     'client@example.com',
     '$2a$12$4myjrscauMlgN6qyUEOFf.uTx2cYUrUJcWKImXsegDJBdxouwA3e.',
-    'Chris Client',
-    'Globex',
+    'Sarah Connor',
+    'Cyberdyne',
     'client'
   )
 on conflict (email) do nothing;

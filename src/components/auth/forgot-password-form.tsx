@@ -1,3 +1,5 @@
+"use client";
+
 import { useFormState } from "react-dom";
 
 import { forgotPasswordAction } from "@/app/(auth)/actions";

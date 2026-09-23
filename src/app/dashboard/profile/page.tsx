@@ -8,7 +8,7 @@ import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
 
-export const metadata: Metadata = { title: t.metadata.profile };
+export const metadata: Metadata = { title: t.metadata.profile, description: t.metadata.descriptionProfile };
 
 /**
  * Profile page. Read-only account facts are shown alongside an editable form
@@ -20,18 +20,18 @@ export default async function ProfilePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">{t.dashboard.profileTitle}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.dashboard.profileSubtitle}</p>
+        <h1 className="text-2xl font-semibold text-zinc-50">{t.dashboard.profileTitle}</h1>
+        <p className="mt-1 text-sm text-zinc-400">{t.dashboard.profileSubtitle}</p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Editable details */}
         <section className="card lg:col-span-2">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">
+          <div className="border-b border-surface-muted px-6 py-4">
+            <h2 className="text-sm font-semibold text-zinc-50">
               {t.dashboard.personalInformation}
             </h2>
-            <p className="text-xs text-slate-500">{t.dashboard.personalInformationSubtitle}</p>
+            <p className="text-xs text-zinc-400">{t.dashboard.personalInformationSubtitle}</p>
           </div>
           <div className="p-6">
             <ProfileForm profile={profile} />
@@ -40,11 +40,11 @@ export default async function ProfilePage() {
 
         {/* Read-only account facts */}
         <section className="card h-fit">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">{t.dashboard.accountSection}</h2>
-            <p className="text-xs text-slate-500">{t.dashboard.accountSectionSubtitle}</p>
+          <div className="border-b border-surface-muted px-6 py-4">
+            <h2 className="text-sm font-semibold text-zinc-50">{t.dashboard.accountSection}</h2>
+            <p className="text-xs text-zinc-400">{t.dashboard.accountSectionSubtitle}</p>
           </div>
-          <dl className="divide-y divide-slate-100">
+          <dl className="divide-y divide-surface-muted">
             <AccountRow label={t.dashboard.accountEmail} value={profile.email} />
             <AccountRow label={t.dashboard.accountRole} value={<RoleBadge role={profile.role} />} />
             <AccountRow
@@ -65,8 +65,8 @@ export default async function ProfilePage() {
 function AccountRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 px-6 py-3">
-      <dt className="text-sm text-slate-500">{label}</dt>
-      <dd className="text-right text-sm font-medium text-slate-900">{value}</dd>
+      <dt className="text-sm text-zinc-400">{label}</dt>
+      <dd className="text-right text-sm font-medium text-zinc-50">{value}</dd>
     </div>
   );
 }

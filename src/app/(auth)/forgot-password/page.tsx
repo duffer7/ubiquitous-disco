@@ -7,7 +7,7 @@ import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
 
-export const metadata: Metadata = { title: t.metadata.forgotPassword };
+export const metadata: Metadata = { title: t.metadata.forgotPassword, description: t.metadata.descriptionForgotPassword };
 
 export default function ForgotPasswordPage() {
   return (

@@ -10,7 +10,7 @@ import { getMessages } from "@/i18n/server";
 import type { UserRole, UserSort } from "@/types/database.types";
 
 const t = getMessages();
-export const metadata: Metadata = { title: t.metadata.adminUsers };
+export const metadata: Metadata = { title: t.metadata.adminUsers, description: t.metadata.descriptionAdminUsers };
 
 const PAGE_SIZE = 10;
 const VALID_ROLES: UserRole[] = ["client", "admin"];
@@ -74,14 +74,14 @@ export default async function AdminUsersPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">{t.admin.usersTitle}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.admin.usersSubtitle}</p>
+        <h1 className="text-2xl font-semibold text-zinc-50">{t.admin.usersTitle}</h1>
+        <p className="mt-1 text-sm text-zinc-400">{t.admin.usersSubtitle}</p>
       </div>
       <UserFilters search={search} role={role} sort={sort} direction={direction} />
 
       <div className="card overflow-hidden">
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">
+        <div className="border-b border-surface-muted px-6 py-4">
+          <h2 className="text-sm font-semibold text-zinc-50">
             {data.total} {data.total === 1 ? t.admin.userCountOne : t.admin.userCountMany}
           </h2>
         </div>

@@ -7,7 +7,7 @@ import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
 
-export const metadata: Metadata = { title: t.metadata.register };
+export const metadata: Metadata = { title: t.metadata.register, description: t.metadata.descriptionRegister };
 
 export default function RegisterPage() {
   return (

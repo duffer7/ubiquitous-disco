@@ -44,12 +44,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         {...props}
       />
       {hint && !messages.length && (
-        <p id={hintId} className="mt-1 text-xs text-slate-500">
+        <p id={hintId} className="mt-1 text-xs text-zinc-500">
           {hint}
         </p>
       )}
       {messages.map((message) => (
-        <p key={message} id={errorId} role="alert" className="mt-1 text-xs text-red-600">
+        <p key={message} id={errorId} role="alert" className="mt-1 text-xs text-red-400">
           {message}
         </p>
       ))}

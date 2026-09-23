@@ -15,7 +15,8 @@
 
 const en = {
   common: {
-    appName: "SaaS Dashboard",
+    appName: "Orbit",
+    tagline: "Control your product universe.",
     loading: "Loading",
     saveChanges: "Save changes",
     cancel: "Cancel",
@@ -29,32 +30,54 @@ const en = {
   },
 
   nav: {
-    dashboard: "Dashboard",
-    activity: "Activity",
+    dashboard: "Command Center",
+    activity: "Activity Signals",
     profile: "Profile",
-    admin: "Admin",
+    admin: "Operations Hub",
     signOut: "Sign out",
   },
 
   roles: {
-    client: "Client",
-    admin: "Admin",
+    client: "Member",
+    admin: "Operator",
   },
 
   landing: {
     signIn: "Sign in",
     getStarted: "Get started",
     createAccount: "Create an account",
-    heading: "Your product dashboard, ready to ship.",
+    eyebrow: "Customer Operations Platform",
+    heading: "Customer operations in one powerful dashboard.",
     subheading:
-      "Authentication, protected routes and a PostgreSQL-backed data layer — built on Next.js, TypeScript and Tailwind CSS.",
+      "Orbit helps SaaS teams manage users, monitor activity, and keep customer data organized through a clean, production-ready command center.",
+    ctaGetStarted: "Get started",
+    ctaExplore: "Explore the Command Center",
+    featureUsersTitle: "User management",
+    featureUsersBody:
+      "Organize customer accounts, update profiles, and maintain records from one centralized workspace.",
+    featureActivityTitle: "Activity monitoring",
+    featureActivityBody:
+      "Follow sign-ins, profile updates and account actions to understand engagement in real time.",
+    featureSecureTitle: "Secure authentication",
+    featureSecureBody:
+      "Built-in registration, password recovery and protected routes designed for modern applications.",
+    featureAdminTitle: "Administrative control",
+    featureAdminBody:
+      "Search users, manage accounts and access operational insights from an intuitive Operations Hub.",
+    trustedBy: "Built for modern SaaS teams",
+    seoParagraph1:
+      "Orbit is a modern customer operations platform built for SaaS products that need a simple and scalable way to manage users and business processes.",
+    seoParagraph2:
+      "From a single workspace, teams can monitor customer activity, manage accounts, review operational metrics, and maintain full visibility across their user base. Orbit combines authentication, user administration, and activity monitoring into a clean and intuitive dashboard designed for growing businesses.",
+    seoParagraph3:
+      "Whether you are launching a new SaaS product or managing an expanding customer base, Orbit provides the tools needed to organize users, improve operational efficiency, and maintain a consistent customer experience.",
   },
 
   auth: {
     welcomeBackTitle: "Welcome back",
-    welcomeBackSubtitle: "Sign in to access your dashboard.",
-    createAccountTitle: "Create your account",
-    createAccountSubtitle: "Get started in a few seconds.",
+    welcomeBackSubtitle: "Access your customer operations center.",
+    createAccountTitle: "Create your Orbit workspace",
+    createAccountSubtitle: "Start managing customer operations in minutes.",
     forgotTitle: "Reset your password",
     forgotSubtitle: "Enter your email and we'll send you a reset link.",
     resetTitle: "Set a new password",
@@ -90,7 +113,7 @@ const en = {
     updatePassword: "Update password",
 
     // Feedback
-    accountCreated: "Account created.",
+    accountCreated: "Workspace created.",
     canNowSignInPrefix: "You can now",
     canNowSignInSuffix: ".",
     authCallbackFailed: "We couldn't verify that link. Please try signing in again.",
@@ -99,7 +122,17 @@ const en = {
   dashboard: {
     welcomeBack: (name: string) => `Welcome back, ${name}`,
     welcomeFallback: "there",
-    snapshotSubtitle: "Here's a snapshot of your account.",
+    snapshotSubtitle: "Monitor users, activity and growth from a single place.",
+
+    // Product Pulse — the headline metric of the Command Center.
+    pulseTitle: "Product Pulse",
+    pulseSubtitle: "A live read on the health of your customer universe.",
+    pulseScore: "Pulse Score",
+    pulseActive: "Active",
+    pulseSteady: "Steady",
+    pulseAtRisk: "At risk",
+    pulseHint: (score: number) => `${score}/100 · recalculated live`,
+
     forbidden: "You don't have permission to access that page.",
 
     accountStatus: "Account status",
@@ -113,20 +146,21 @@ const en = {
     recentActivitySubtitle: "Your latest account events.",
     viewAll: "View all",
     activityError: "We couldn't load your activity. Please refresh.",
-    noActivityTitle: "No activity yet",
+    noActivityTitle: "No activity yet.",
     noActivityDescription:
-      "Your account activity will appear here as you use the product.",
+      "Once customers start interacting with your platform, events and insights will appear here.",
 
     // Activity page
-    activityTitle: "Activity",
-    activityPageSubtitle: "A chronological history of your account events.",
-    eventsOne: "event",
-    eventsMany: "events",
+    activityTitle: "Activity Signals",
+    activityPageSubtitle: "Follow sign-ins, updates and engagement across your universe.",
+    eventsOne: "signal",
+    eventsMany: "signals",
     activityLoadErrorTitle: "We couldn't load your activity",
     activityLoadErrorDescription:
       "Something went wrong while loading your history. Please refresh the page.",
     retry: "Retry",
-    noMatchingActivityTitle: "No matching activity",
+
+    noMatchingActivityTitle: "Nothing found in this sector",
     noMatchingActivityDescription:
       "Try adjusting or clearing the filters to see more results.",
     clearFilters: "Clear filters",
@@ -137,7 +171,6 @@ const en = {
     filterFrom: "From",
     filterTo: "To",
 
-    // Profile page
     profileTitle: "Profile",
     profileSubtitle: "Manage your personal information and account details.",
     personalInformation: "Personal information",
@@ -157,54 +190,58 @@ const en = {
   },
 
   admin: {
-    overviewTitle: "Admin overview",
-    overviewSubtitle: "Platform statistics and the latest activity across all users.",
+    overviewTitle: "Operations Hub",
+    overviewSubtitle: "Manage users and keep your product healthy.",
     manageUsers: "Manage users",
 
-    statTotalUsers: "Total users",
-    statAdmins: "Admins",
-    statClients: "Clients",
+    statTotalUsers: "Members",
+    statAdmins: "Operators",
+    statClients: "Members",
     statNew7: "New (7 days)",
     statNew30Hint: (n: number) => `${n} in the last 30 days`,
     statActive7: "Active (7 days)",
-    statActive7Hint: "Users with activity",
-    statAdminShare: "Admin share",
+    statActive7Hint: "Members with activity",
+    statAdminShare: "Operator share",
+    statAvgPulse: "Avg Pulse Score",
+    statAvgPulseHint: "Product health",
 
-    newestUsers: "Newest users",
+    newestUsers: "Newest members",
     viewAll: "View all",
-    noUsersYet: "No users yet.",
+    noUsersYet: "No members yet.",
     recentPlatformActivity: "Recent platform activity",
     noActivityYet: "No activity recorded yet.",
 
     // Users list
-    usersTitle: "Users",
-    usersSubtitle: "Search, filter and manage all registered accounts.",
+    usersTitle: "Customer Directory",
+    usersSubtitle: "Search, filter and manage every account in your universe.",
     searchLabel: "Search",
     searchPlaceholder: "Name, email or company…",
     roleLabel: "Role",
     allRoles: "All roles",
-    roleClients: "Clients",
-    roleAdmins: "Admins",
-    userCountOne: "user",
-    userCountMany: "users",
+    roleClients: "Members",
+    roleAdmins: "Operators",
+    userCountOne: "member",
+    userCountMany: "members",
     usersLoadErrorTitle: "We couldn't load users",
     usersLoadErrorDescription:
       "Something went wrong querying the directory. Please refresh the page.",
-    noUsersMatchTitle: "No users match your filters",
+    noUsersMatchTitle: "Nothing found in this sector",
     noUsersMatchDescription: "Try a different search term or clear the filters.",
-    noUsersDirectoryTitle: "No users yet",
-    noUsersDirectoryDescription: "Registered accounts will appear here.",
+    noUsersDirectoryTitle: "Your universe is empty",
+    noUsersDirectoryDescription:
+      "Add your first customer and begin building your product ecosystem.",
 
     // Table columns
-    colUser: "User",
+    colUser: "Member",
     colRole: "Role",
     colActivity: "Activity",
+    colPulse: "Pulse",
     colJoined: "Joined",
     colActions: "Actions",
 
     // User detail
-    backToUsers: "← Back to users",
-    editUser: "Edit user",
+    backToUsers: "← Back to directory",
+    editUser: "Edit member",
     editUserSubtitle: "Update account details and role.",
     totalActivity: "Total activity",
     totalActivityHint: "Recorded events",
@@ -212,39 +249,40 @@ const en = {
     lastUpdated: "Last updated",
     recentActivity: "Recent activity",
     noActivityTitle: "No activity",
-    noActivityDescription: "This user has no recorded events.",
+    noActivityDescription: "This member has no recorded events.",
     dangerZone: "Danger zone",
-    deleteUser: "Delete user",
+    deleteUser: "Delete member",
     deleteConfirmPrefix: "Permanently delete",
     deleteConfirmSuffix:
       "and all associated activity? This cannot be undone.",
     yesDelete: "Yes, delete",
 
     // User edit form fields
-    roleClientOption: "Client",
-    roleAdminOption: "Admin",
+    roleClientOption: "Member",
+    roleAdminOption: "Operator",
 
     // Messages (server action results)
-    userUpdated: "User updated successfully.",
+    userUpdated: "Member updated successfully.",
     roleUpdated: (role: string) => `Role updated to ${role}.`,
     userDeleted: (email: string) => `Deleted ${email}.`,
-    invalidUserId: "Invalid user id.",
-    userNoLongerExists: "That user no longer exists.",
-    cannotDemoteLastAdmin: "You can't demote the last administrator.",
-    cannotDeleteLastAdmin: "You can't delete the last administrator.",
+    invalidUserId: "Invalid member id.",
+    userNoLongerExists: "That member no longer exists.",
+    cannotDemoteLastAdmin: "You can't demote the last operator.",
+    cannotDeleteLastAdmin: "You can't delete the last operator.",
     cannotDeleteSelf: "You can't delete your own account here.",
     emailInUse: "Another account already uses this email.",
-    updateUserFailed: "We couldn't update this user. Please try again.",
+    updateUserFailed: "We couldn't update this member. Please try again.",
   },
 
   errors: {
     genericTitle: "Something went wrong",
     dashboardMessage: "We couldn't load this page. Please try again.",
-    adminMessage: "We couldn't load the admin panel. Please try again.",
+    adminMessage: "We couldn't load the Operations Hub. Please try again.",
     notFoundCode: "404",
-    notFoundTitle: "Page not found",
-    notFoundDescription: "The page you're looking for doesn't exist or has moved.",
-    goHome: "Go home",
+    notFoundTitle: "This sector is uncharted",
+    notFoundDescription:
+      "The page you're looking for could not be found. Return to the Orbit Command Center and continue exploring your customer universe.",
+    goHome: "Return to Command Center",
     skipToContent: "Skip to content",
   },
 
@@ -256,7 +294,9 @@ const en = {
   },
 
   footer: {
-    rights: (year: number) => `© ${year} SaaS Dashboard`,
+    rights: (year: number) => `© ${year} Orbit`,
+    blurb:
+      "Orbit is a customer operations platform designed for SaaS businesses. The platform combines user management, authentication, activity monitoring, and operational insights to help teams manage customer relationships more effectively and scale their products with confidence.",
   },
 
   validation: {
@@ -305,18 +345,40 @@ const en = {
   },
 
   metadata: {
-    signIn: "Sign in",
-    register: "Create account",
-    forgotPassword: "Forgot password",
-    resetPassword: "Set a new password",
-    dashboard: "Dashboard",
-    activity: "Activity",
-    profile: "Profile",
-    admin: "Admin",
-    adminUsers: "Users · Admin",
-    adminUser: "User · Admin",
-    titleTemplate: "%s · SaaS Dashboard",
-    description: "Client and admin dashboard for an early-stage SaaS product.",
+    signIn: "Login",
+    register: "Create Account",
+    forgotPassword: "Reset Password",
+    resetPassword: "Reset Password",
+    dashboard: "Command Center",
+    activity: "Activity Signals",
+    profile: "Account Settings",
+    admin: "Operations Hub",
+    adminUsers: "Customer Directory",
+    adminUser: "Customer Profile",
+    titleTemplate: "%s | Orbit",
+    description:
+      "Orbit is a modern customer operations platform for SaaS teams. Manage users, monitor activity, control access, and gain operational insights from a single dashboard.",
+    // Per-page meta descriptions for SEO.
+    descriptionSignIn:
+      "Securely access your Orbit workspace and manage customers, accounts, and business operations from anywhere.",
+    descriptionRegister:
+      "Create your Orbit account and gain access to a modern customer operations platform designed for SaaS businesses.",
+    descriptionForgotPassword:
+      "Recover access to your Orbit account securely and return to managing customer operations without interruption.",
+    descriptionResetPassword:
+      "Set a new password and return to your Orbit customer operations workspace.",
+    descriptionDashboard:
+      "Track customer activity, monitor business operations, and manage user engagement through the Orbit Command Center.",
+    descriptionActivity:
+      "Review recent user events, account actions, and platform activity within Orbit's activity monitoring center.",
+    descriptionProfile:
+      "Manage personal account information, update preferences, and secure your Orbit workspace.",
+    descriptionAdmin:
+      "Manage platform users, review operational insights, and oversee customer activity through Orbit's Operations Hub.",
+    descriptionAdminUsers:
+      "Browse, search, and manage customer accounts from a centralized user administration interface.",
+    descriptionAdminUser:
+      "View detailed customer information, account activity, and engagement insights within the Orbit platform.",
   },
 
   // Human labels for activity actions ("auth.signed_in" → key below)
@@ -326,9 +388,9 @@ const en = {
     password_reset: "Password reset",
     created: "Created",
     updated: "Updated",
-    user_updated: "User updated",
-    user_role_changed: "User role changed",
-    user_deleted: "User deleted",
+    user_updated: "Member updated",
+    user_role_changed: "Role changed",
+    user_deleted: "Member deleted",
   } as Record<string, string>,
 } as const;
 

@@ -34,7 +34,7 @@ export function UserTable({
       {/* Desktop table */}
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+          <thead className="border-b border-surface-muted text-xs uppercase tracking-wide text-zinc-400">
             <tr>
               <SortHeader
                 column="full_name"
@@ -65,41 +65,41 @@ export function UserTable({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
+          <tbody className="divide-y divide-surface-muted">
             {users.map((user) => (
-              <tr key={user.id} className="hover:bg-slate-50">
+              <tr key={user.id} className="hover:bg-surface">
                 <td className="px-6 py-3">
                   <div className="flex items-center gap-3">
                     <span
                       aria-hidden
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-600/20 text-xs font-semibold text-brand-300"
                     >
                       {initials(user.full_name, user.email)}
                     </span>
                     <div className="min-w-0">
-                      <p className="truncate font-medium text-slate-800">
+                      <p className="truncate font-medium text-zinc-100">
                         {user.full_name || "—"}
                       </p>
-                      <p className="truncate text-xs text-slate-500">{user.email}</p>
+                      <p className="truncate text-xs text-zinc-400">{user.email}</p>
                     </div>
                   </div>
                 </td>
                 <td className="px-6 py-3">
                   <RoleBadge role={user.role} />
                 </td>
-                <td className="px-6 py-3 text-slate-600">
+                <td className="px-6 py-3 text-zinc-300">
                   <span className="font-medium">{user.activity_count}</span>
                   {user.last_active_at && (
-                    <span className="block text-xs text-slate-400">
+                    <span className="block text-xs text-zinc-500">
                       {formatRelative(user.last_active_at)}
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-3 text-slate-500">{formatRelative(user.created_at)}</td>
+                <td className="px-6 py-3 text-zinc-400">{formatRelative(user.created_at)}</td>
                 <td className="px-6 py-3 text-right">
                   <Link
                     href={`/admin/users/${user.id}` as Route}
-                    className="text-xs font-medium text-brand-600 hover:underline"
+                    className="text-xs font-medium text-brand-400 hover:underline"
                   >
                     {t.common.view}
                   </Link>
@@ -111,7 +111,7 @@ export function UserTable({
       </div>
 
       {/* Mobile cards */}
-      <ul className="divide-y divide-slate-100 md:hidden">
+      <ul className="divide-y divide-surface-muted md:hidden">
         {users.map((user) => (
           <li key={user.id}>
             <Link
@@ -120,15 +120,15 @@ export function UserTable({
             >
               <span
                 aria-hidden
-                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-600/20 text-xs font-semibold text-brand-300"
               >
                 {initials(user.full_name, user.email)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-slate-800">
+                <p className="truncate text-sm font-medium text-zinc-100">
                   {user.full_name || user.email}
                 </p>
-                <p className="truncate text-xs text-slate-500">{user.email}</p>
+                <p className="truncate text-xs text-zinc-400">{user.email}</p>
               </div>
               <RoleBadge role={user.role} />
             </Link>
@@ -160,11 +160,11 @@ function SortHeader({
     <th scope="col" className="px-6 py-3 font-medium">
       <Link
         href={href as Route}
-        className="inline-flex items-center gap-1 hover:text-slate-700"
+        className="inline-flex items-center gap-1 hover:text-zinc-200"
         aria-sort={isActive ? (direction === "asc" ? "ascending" : "descending") : "none"}
       >
         {label}
-        <span aria-hidden className={isActive ? "text-brand-600" : "text-slate-300"}>
+        <span aria-hidden className={isActive ? "text-brand-400" : "text-zinc-600"}>
           {isActive && direction === "asc" ? "▲" : "▼"}
         </span>
       </Link>

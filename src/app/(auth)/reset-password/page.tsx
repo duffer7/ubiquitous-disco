@@ -7,7 +7,7 @@ import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
 
-export const metadata: Metadata = { title: t.metadata.resetPassword };
+export const metadata: Metadata = { title: t.metadata.resetPassword, description: t.metadata.descriptionResetPassword };
 
 /**
  * Reached via the password-recovery link, which contains a single-use token:
@@ -28,14 +28,14 @@ export default function ResetPasswordPage({
         title={t.auth.resetLinkRequiredTitle}
         subtitle={t.auth.resetLinkRequiredSubtitle}
         footer={
-          <Link href="/login" className="font-medium text-brand-600 hover:underline">
+          <Link href="/login" className="font-medium text-brand-400 hover:underline">
             {t.auth.backToSignIn}
           </Link>
         }
       >
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-zinc-300">
           {t.auth.resetLinkRequiredBodyStart}{" "}
-          <Link href="/forgot-password" className="font-medium text-brand-600 hover:underline">
+          <Link href="/forgot-password" className="font-medium text-brand-400 hover:underline">
             {t.auth.requestNewLink}
           </Link>
           {t.auth.resetLinkRequiredBodyEnd}
@@ -49,7 +49,7 @@ export default function ResetPasswordPage({
       title={t.auth.resetTitle}
       subtitle={t.auth.resetSubtitle}
       footer={
-        <Link href="/login" className="font-medium text-brand-600 hover:underline">
+        <Link href="/login" className="font-medium text-brand-400 hover:underline">
           {t.auth.backToSignIn}
         </Link>
       }

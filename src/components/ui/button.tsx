@@ -8,7 +8,7 @@ const variantClasses: Record<Variant, string> = {
   primary: "btn-primary",
   secondary: "btn-secondary",
   danger: "btn-danger",
-  ghost: "btn text-slate-600 hover:bg-slate-100",
+  ghost: "btn text-zinc-300 hover:bg-surface-muted",
 };
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

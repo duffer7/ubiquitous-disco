@@ -15,7 +15,7 @@ import { formatDate, formatRelative, humanizeAction, initials } from "@/lib/util
 import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
-export const metadata: Metadata = { title: t.metadata.adminUser };
+export const metadata: Metadata = { title: t.metadata.adminUser, description: t.metadata.descriptionAdminUser };
 
 /** Admin detail view: edit a user, see their recent activity, delete. */
 export default async function AdminUserDetailPage({ params }: { params: { id: string } }) {
@@ -31,7 +31,7 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
       <div>
         <Link
           href={"/admin/users" as Route}
-          className="text-xs font-medium text-brand-600 hover:underline"
+          className="text-xs font-medium text-brand-400 hover:underline"
         >
           {t.admin.backToUsers}
         </Link>
@@ -42,13 +42,13 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         <div className="flex items-center gap-4">
           <span
             aria-hidden
-            className="grid h-14 w-14 place-items-center rounded-full bg-brand-100 text-lg font-semibold text-brand-700"
+            className="grid h-14 w-14 place-items-center rounded-full bg-brand-600/20 text-lg font-semibold text-brand-300"
           >
             {initials(user.full_name, user.email)}
           </span>
           <div>
-            <h1 className="text-xl font-semibold text-slate-900">{user.full_name || "—"}</h1>
-            <p className="text-sm text-slate-500">{user.email}</p>
+            <h1 className="text-xl font-semibold text-zinc-50">{user.full_name || "—"}</h1>
+            <p className="text-sm text-zinc-400">{user.email}</p>
           </div>
         </div>
         <RoleBadge role={user.role} />
@@ -71,9 +71,9 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Edit form */}
         <section className="card lg:col-span-2">
-          <div className="border-b border-slate-200 px-6 py-4">
-            <h2 className="text-sm font-semibold text-slate-900">{t.admin.editUser}</h2>
-            <p className="text-xs text-slate-500">{t.admin.editUserSubtitle}</p>
+          <div className="border-b border-surface-muted px-6 py-4">
+            <h2 className="text-sm font-semibold text-zinc-50">{t.admin.editUser}</h2>
+            <p className="text-xs text-zinc-400">{t.admin.editUserSubtitle}</p>
           </div>
           <div className="p-6">
             <UserEditForm user={user} />
@@ -83,8 +83,8 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
         <div className="space-y-6">
           {/* Recent activity */}
           <section className="card">
-            <div className="border-b border-slate-200 px-6 py-4">
-              <h2 className="text-sm font-semibold text-slate-900">{t.admin.recentActivity}</h2>
+            <div className="border-b border-surface-muted px-6 py-4">
+              <h2 className="text-sm font-semibold text-zinc-50">{t.admin.recentActivity}</h2>
             </div>
             <div className="p-6">
               {activity.items.length === 0 ? (
@@ -96,10 +96,10 @@ export default async function AdminUserDetailPage({ params }: { params: { id: st
                 <ul className="space-y-3">
                   {activity.items.map((log) => (
                     <li key={log.id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="truncate text-slate-700">
+                      <span className="truncate text-zinc-200">
                         {humanizeAction(log.action, t.activityActions)}
                       </span>
-                      <span className="shrink-0 text-xs text-slate-400">
+                      <span className="shrink-0 text-xs text-zinc-500">
                         {formatRelative(log.created_at)}
                       </span>
                     </li>

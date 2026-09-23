@@ -4,24 +4,19 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { I18nProvider } from "@/i18n/provider";
 import { getLocale, getMessages } from "@/i18n/server";
+import { metadata as siteMetadata, softwareAppJsonLd } from "@/shared/config/metadata";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 
 const t = getMessages();
 
-export const metadata: Metadata = {
-  title: {
-    default: t.common.appName,
-    template: t.metadata.titleTemplate,
-  },
-  description: t.metadata.description,
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-};
+// Site-wide SEO metadata (Open Graph, Twitter, robots, keywords, icons).
+export const metadata: Metadata = siteMetadata;
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#4f46e5",
+  themeColor: "#09090B",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -34,6 +29,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           {t.errors.skipToContent}
         </a>
+        {/* SoftwareApplication structured data for rich search results. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareAppJsonLd) }}
+        />
         <I18nProvider locale={getLocale()}>{children}</I18nProvider>
       </body>
     </html>

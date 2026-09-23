@@ -1,8 +1,8 @@
 {
-  "name": "saas-dashboard",
+  "name": "orbit",
   "version": "0.1.0",
   "private": true,
-  "description": "Client & Admin dashboard for an early-stage SaaS product (Next.js + TypeScript + PostgreSQL)",
+  "description": "Orbit — a Customer Operations Platform for SaaS teams (Next.js + TypeScript + PostgreSQL)",
   "engines": {
     "node": ">=18.18.0"
   },

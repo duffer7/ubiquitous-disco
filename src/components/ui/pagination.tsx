@@ -49,7 +49,8 @@ export function Pagination({
   return (
     <nav
       aria-label={t.pagination.ariaLabel}
-      className="flex items-center justify-between gap-2 border-t border-slate-200 px-6 py-4 text-sm"
+
+      className="flex items-center justify-between gap-2 border-t border-surface-muted px-6 py-4 text-sm"
     >
       <PaginationLink
         href={buildHref(current - 1)}
@@ -62,7 +63,7 @@ export function Pagination({
       <ul className="hidden items-center gap-1 sm:flex">
         {items.map((item, index) =>
           item === null ? (
-            <li key={`gap-${index}`} className="px-2 text-slate-400" aria-hidden>
+            <li key={`gap-${index}`} className="px-2 text-zinc-500" aria-hidden>
               …
             </li>
           ) : (
@@ -74,7 +75,7 @@ export function Pagination({
                   "inline-flex h-9 min-w-9 items-center justify-center rounded-lg px-3",
                   item === current
                     ? "bg-brand-600 font-medium text-white"
-                    : "text-slate-600 hover:bg-slate-100",
+                    : "text-zinc-300 hover:bg-surface-muted",
                 )}
               >
                 {item}
@@ -112,7 +113,7 @@ function PaginationLink({
       <span
         aria-disabled="true"
         aria-label={label}
-        className="rounded-lg px-3 py-1.5 text-slate-300"
+        className="rounded-lg px-3 py-1.5 text-zinc-600"
       >
         {children}
       </span>
@@ -122,7 +123,7 @@ function PaginationLink({
     <Link
       href={href as Route}
       aria-label={label}
-      className="rounded-lg px-3 py-1.5 text-slate-600 hover:bg-slate-100"
+      className="rounded-lg px-3 py-1.5 text-zinc-300 hover:bg-surface-muted"
     >
       {children}
     </Link>

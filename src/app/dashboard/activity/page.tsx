@@ -13,7 +13,7 @@ import { buildQueryString, parsePage } from "@/lib/utils";
 import { getMessages } from "@/i18n/server";
 
 const t = getMessages();
-export const metadata: Metadata = { title: t.metadata.activity };
+export const metadata: Metadata = { title: t.metadata.activity, description: t.metadata.descriptionActivity };
 
 const PAGE_SIZE = 15;
 
@@ -59,8 +59,8 @@ export default async function ActivityPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">{t.dashboard.activityTitle}</h1>
-        <p className="mt-1 text-sm text-slate-500">{t.dashboard.activityPageSubtitle}</p>
+        <h1 className="text-2xl font-semibold text-zinc-50">{t.dashboard.activityTitle}</h1>
+        <p className="mt-1 text-sm text-zinc-400">{t.dashboard.activityPageSubtitle}</p>
       </div>
       <ActivityFilters
         action={searchParams.action}
@@ -69,8 +69,8 @@ export default async function ActivityPage({
       />
 
       <div className="card">
-        <div className="border-b border-slate-200 px-6 py-4">
-          <h2 className="text-sm font-semibold text-slate-900">
+        <div className="border-b border-surface-muted px-6 py-4">
+          <h2 className="text-sm font-semibold text-zinc-50">
             {data.total} {data.total === 1 ? t.dashboard.eventsOne : t.dashboard.eventsMany}
           </h2>
         </div>

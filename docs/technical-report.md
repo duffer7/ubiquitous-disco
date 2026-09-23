@@ -1,6 +1,6 @@
 # Technical Report — Stage 1
 
-**Project:** SaaS Dashboard (client & admin panel) — **self-hosted**
+**Project:** Orbit — Customer Operations Platform (client & admin panel) — **self-hosted**
 **Scope:** Stage 1 — project setup, authentication, database
 **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · PostgreSQL ·
 Custom JWT auth (jose + bcryptjs) · Zod · Docker Compose

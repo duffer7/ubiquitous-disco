@@ -1,12 +1,31 @@
-# SaaS Dashboard
+# Orbit
 
-A production-ready client & admin dashboard for an early-stage SaaS product,
-built with **Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and
-**PostgreSQL** — fully self-hosted, with a custom authentication layer. The
-whole stack runs in **Docker Compose**.
+> **Control your product universe.**
 
-> **Status:** Stage 1 complete — project setup, authentication and database.
-> Stages 2 (client/admin panel features) and 3 (testing, deploy, polish) follow.
+**Orbit is a production-ready customer operations platform** built with
+**Next.js (App Router)**, **TypeScript**, **Tailwind CSS** and **PostgreSQL** —
+fully self-hosted, with a custom authentication layer. It combines user
+management, authentication, activity monitoring and operational insights into a
+single command center designed for growing SaaS teams.
+
+The project demonstrates scalable frontend architecture, secure authentication,
+modern API design and deploy-ready infrastructure. The whole stack runs in
+**Docker Compose**.
+
+> **Status:** Stages 1–2 complete — project setup, authentication, database, and
+> full client/admin panels. Stage 3 (deployment hardening, final polish) follows.
+
+## Positioning
+
+Orbit is not just an admin dashboard — it's a **Customer Operations Center**.
+Its uniqueness comes from a product-level metaphor: managing a *universe* of
+users orbiting a central product core.
+
+- **Orbit Pulse™** — a health score for every account, derived from recent
+  activity, recency of sign-in and profile completeness.
+- **Product Pulse** — the headline metric of the Command Center.
+- **Product vocabulary** — Command Center, Operations Hub, Activity Signals,
+  Customer Directory. A coherent brand language instead of generic CRUD terms.
 
 ---
 
@@ -183,10 +202,10 @@ first run.
 
 ### Demo accounts
 
-| Email                | Password    | Role   |
-| -------------------- | ----------- | ------ |
-| `admin@example.com`  | `Admin1234` | admin  |
-| `client@example.com` | `Client1234`| client |
+| Email                | Password    | Role     |
+| -------------------- | ----------- | -------- |
+| `admin@example.com`  | `Admin1234` | Operator |
+| `client@example.com` | `Client1234`| Member   |
 
 > These are **development** credentials from `db/init/002_seed.sql`. Never ship
 > them to production.
@@ -305,9 +324,26 @@ npm run db:seed      # applies the demo data
 | `/register`          | Public        | Create account                       |
 | `/forgot-password`   | Public        | Request reset link                   |
 | `/reset-password`    | Public (token)| Set a new password                   |
-| `/dashboard`         | Authenticated | Client dashboard                     |
-| `/dashboard/profile` | Authenticated | Profile view                         |
-| `/admin`             | Admin         | Admin area (features land in Stage 2)|
+| `/dashboard`         | Authenticated | Command Center                       |
+| `/dashboard/activity`| Authenticated | Activity Signals                     |
+| `/dashboard/profile` | Authenticated | Account Settings                     |
+| `/admin`             | Admin         | Operations Hub                       |
+| `/admin/users`       | Admin         | Customer Directory                   |
+
+### SEO infrastructure
+
+Orbit ships a complete technical-SEO setup, centered on a single config file:
+
+| File                          | Purpose                                              |
+| ----------------------------- | ---------------------------------------------------- |
+| `src/shared/config/metadata.ts`| Site-wide metadata, Open Graph, Twitter, JSON-LD     |
+| `src/app/sitemap.ts`          | `/sitemap.xml` — indexable public routes             |
+| `src/app/robots.ts`           | `/robots.txt` — disallows auth-guarded areas         |
+| `src/app/manifest.ts`         | `/manifest.webmanifest` — PWA / theme color          |
+
+The root layout (`src/app/layout.tsx`) consumes the central config and injects
+`SoftwareApplication` JSON-LD structured data. Pages override only their
+`title` and `description` (e.g. `Command Center`, `Operations Hub`).
 
 ---
 
@@ -318,8 +354,8 @@ container host works (AWS ECS/Fargate, Fly.io, Render, a VPS, ...).
 
 1. Build and push the image:
    ```bash
-   docker build -t your-registry/saas-dashboard:latest .
-   docker push your-registry/saas-dashboard:latest
+   docker build -t your-registry/orbit:latest .
+   docker push your-registry/orbit:latest
    ```
 2. Provide `DATABASE_URL`, `JWT_SECRET` and `NEXT_PUBLIC_SITE_URL` as
    environment variables/secrets.
@@ -349,7 +385,7 @@ container host works (AWS ECS/Fargate, Fly.io, Render, a VPS, ...).
 ## Roadmap
 
 - **Stage 1 (done):** setup, authentication, database. ✅
-- **Stage 2:** client panel (profile editing, full activity), admin panel
-  (user list, search/filter, detail view, editing, aggregate stats).
+- **Stage 2 (done):** client panel (profile editing, full activity), admin panel
+  (user list, search/filter, detail view, editing, aggregate stats). ✅
 - **Stage 3:** testing, deployment hardening, documentation polish, final
   delivery.

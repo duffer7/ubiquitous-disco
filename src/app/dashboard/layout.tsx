@@ -8,12 +8,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const t = getMessages();
 
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50">
+    <div className="flex min-h-screen flex-col bg-surface">
       <AppHeader profile={profile} />
       <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
         {children}
       </main>
-      <footer className="border-t border-slate-200 px-4 py-6 text-center text-xs text-slate-400">
+      <footer className="border-t border-surface-muted px-4 py-6 text-center text-xs text-zinc-500">
         {t.footer.rights(new Date().getFullYear())}
       </footer>
     </div>
