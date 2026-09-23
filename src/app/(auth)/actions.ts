@@ -20,22 +20,15 @@ import {
   logActivity,
   updatePassword,
 } from "@/lib/db/users";
+import { getMessages } from "@/i18n/server";
 import type { ActionState } from "@/lib/form-state";
+import { toFieldErrors } from "@/lib/form-state";
 import {
   forgotPasswordSchema,
   resetPasswordSchema,
   signInSchema,
   signUpSchema,
 } from "@/lib/validation/auth";
-
-function toFieldErrors(error: { issues: { path: (string | number)[]; message: string }[] }) {
-  const fieldErrors: Record<string, string[]> = {};
-  for (const issue of error.issues) {
-    const key = String(issue.path[0] ?? "_form");
-    (fieldErrors[key] ??= []).push(issue.message);
-  }
-  return fieldErrors;
-}
 
 async function setSessionCookie(userId: string, role: "client" | "admin") {
   const token = await createSessionToken({ userId, role });
@@ -57,6 +50,8 @@ export async function signUpAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = getMessages();
+
   const parsed = signUpSchema.safeParse({
     fullName: formData.get("fullName"),
     email: formData.get("email"),
@@ -70,7 +65,7 @@ export async function signUpAction(
   const { fullName, email, password } = parsed.data;
 
   if (await findProfileByEmail(email)) {
-    return { status: "error", message: "An account with this email already exists." };
+    return { status: "error", message: t.action.accountExists };
   }
 
   const passwordHash = await hashPassword(password);
@@ -88,6 +83,8 @@ export async function signInAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = getMessages();
+
   const parsed = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
@@ -99,7 +96,7 @@ export async function signInAction(
 
   const credentials = await findCredentialsByEmail(parsed.data.email);
   if (!credentials || !(await verifyPassword(parsed.data.password, credentials.passwordHash))) {
-    return { status: "error", message: "Invalid email or password." };
+    return { status: "error", message: t.action.invalidCredentials };
   }
 
   await logActivity(credentials.profile.id, "auth.signed_in");
@@ -132,6 +129,8 @@ export async function forgotPasswordAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = getMessages();
+
   const parsed = forgotPasswordSchema.safeParse({ email: formData.get("email") });
 
   if (!parsed.success) {
@@ -144,7 +143,7 @@ export async function forgotPasswordAction(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const base = {
     status: "success" as const,
-    message: "If an account exists for that email, a reset link has been sent.",
+    message: t.api.resetSent,
   };
 
   // DEV ONLY: surface the link so the flow is testable without email delivery.
@@ -162,9 +161,11 @@ export async function resetPasswordAction(
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
+  const t = getMessages();
+
   const token = String(formData.get("token") ?? "");
   if (!token) {
-    return { status: "error", message: "Missing reset token." };
+    return { status: "error", message: t.action.missingResetToken };
   }
 
   const parsed = resetPasswordSchema.safeParse({
@@ -180,7 +181,7 @@ export async function resetPasswordAction(
   if (!verified) {
     return {
       status: "error",
-      message: "This reset link is invalid or has expired. Please request a new one.",
+      message: t.action.resetInvalid,
     };
   }
 

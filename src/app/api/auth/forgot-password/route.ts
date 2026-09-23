@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { badRequest, readJson, tooManyRequests, unprocessable } from "@/lib/api";
 import { createPasswordResetToken } from "@/lib/db/password-reset";
+import { getMessages } from "@/i18n/server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { forgotPasswordSchema } from "@/lib/validation/auth";
 
 /**
@@ -18,22 +21,23 @@ import { forgotPasswordSchema } from "@/lib/validation/auth";
  * see the TODO below.
  */
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  const t = getMessages();
 
+  // Throttle by IP: 3 reset requests per 15 minutes.
+  const limit = rateLimit(`forgot:${getClientIp(request)}`, { limit: 3, windowMs: 900_000 });
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
+  const body = await readJson(request);
+  if (body === null) return badRequest(t.api.invalidJson);
   const parsed = forgotPasswordSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Please enter a valid email." }, { status: 422 });
+    return unprocessable(t.api.invalidEmail);
   }
 
   const token = await createPasswordResetToken(parsed.data.email);
 
   const genericResponse = {
-    message: "If an account exists for that email, a reset link has been sent.",
+    message: t.api.resetSent,
   };
 
   if (process.env.NODE_ENV !== "production" && token) {
@@ -48,3 +52,4 @@ export async function POST(request: Request) {
   // TODO (Stage 3): send the reset email via an SMTP/provider integration.
   return NextResponse.json(genericResponse);
 }
+

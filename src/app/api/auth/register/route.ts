@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 
+import {
+  badRequest,
+  readJson,
+  tooManyRequests,
+  unprocessable,
+  zodFieldErrors,
+} from "@/lib/api";
 import { hashPassword } from "@/lib/auth/password";
 import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS, createSessionToken } from "@/lib/auth/session";
 import { createProfile, findProfileByEmail, logActivity } from "@/lib/db/users";
+import { getMessages } from "@/i18n/server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { signUpSchema } from "@/lib/validation/auth";
 
 /**
@@ -15,36 +24,25 @@ import { signUpSchema } from "@/lib/validation/auth";
  * Body: { fullName: string, email: string, password: string }
  */
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  const t = getMessages();
 
+  // Throttle by IP: 5 sign-ups per 10 minutes.
+  const limit = rateLimit(`register:${getClientIp(request)}`, { limit: 5, windowMs: 600_000 });
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
+  const body = await readJson(request);
+  if (body === null) return badRequest(t.api.invalidJson);
   const parsed = signUpSchema.safeParse(body);
   if (!parsed.success) {
-    const fieldErrors: Record<string, string[]> = {};
-    for (const issue of parsed.error.issues) {
-      const key = String(issue.path[0] ?? "_form");
-      (fieldErrors[key] ??= []).push(issue.message);
-    }
-    return NextResponse.json(
-      { error: "Validation failed.", fieldErrors },
-      { status: 422 },
-    );
+    return unprocessable(t.api.validationFailed, zodFieldErrors(parsed.error));
   }
-
   const { fullName, email, password } = parsed.data;
 
   const existing = await findProfileByEmail(email);
   if (existing) {
     // 409 Conflict. We keep the message generic to avoid confirming accounts,
     // but registration already implies the email is taken, so this is fine.
-    return NextResponse.json(
-      { error: "An account with this email already exists." },
-      { status: 409 },
-    );
+    return NextResponse.json({ error: t.api.accountExists }, { status: 409 });
   }
 
   const passwordHash = await hashPassword(password);
@@ -74,3 +72,4 @@ function setSessionCookie(response: NextResponse, token: string) {
     maxAge: SESSION_MAX_AGE_SECONDS,
   });
 }
+

@@ -1,5 +1,3 @@
-"use client";
-
 import { useFormState } from "react-dom";
 
 import Link from "next/link";
@@ -9,14 +7,16 @@ import { initialActionState } from "@/lib/form-state";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { useMessages } from "@/i18n/provider";
 
 export function LoginForm({ redirectedFrom }: { redirectedFrom?: string }) {
+  const t = useMessages();
   const [state, formAction] = useFormState(signInAction, initialActionState);
 
   return (
     <form action={formAction} className="space-y-4" noValidate>
       {redirectedFrom && (
-        <Alert variant="info">Please sign in to continue.</Alert>
+        <Alert variant="info">{t.auth.pleaseSignIn}</Alert>
       )}
 
       {state.status === "error" && state.message && (
@@ -26,34 +26,33 @@ export function LoginForm({ redirectedFrom }: { redirectedFrom?: string }) {
       <input type="hidden" name="redirectedFrom" value={redirectedFrom ?? "/dashboard"} />
 
       <Input
-        label="Email"
+        label={t.auth.emailLabel}
         name="email"
         type="email"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder={t.auth.emailPlaceholder}
         required
         error={state.fieldErrors?.email}
       />
 
       <div>
         <Input
-          label="Password"
+          label={t.auth.passwordLabel}
           name="password"
           type="password"
           autoComplete="current-password"
-          placeholder="••••••••"
+          placeholder={t.auth.passwordPlaceholder}
           required
           error={state.fieldErrors?.password}
         />
         <div className="mt-2 text-right">
           <Link href="/forgot-password" className="text-xs font-medium text-brand-600 hover:underline">
-            Forgot password?
+            {t.auth.forgotPassword}
           </Link>
         </div>
       </div>
 
-      <SubmitButton>Sign in</SubmitButton>
+      <SubmitButton>{t.auth.signInButton}</SubmitButton>
     </form>
   );
 }
-

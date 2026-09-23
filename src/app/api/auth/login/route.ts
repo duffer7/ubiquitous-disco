@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 
+import { badRequest, readJson, tooManyRequests, unauthorized, zodFieldErrors } from "@/lib/api";
 import { verifyPassword } from "@/lib/auth/password";
 import { SESSION_COOKIE, SESSION_MAX_AGE_SECONDS, createSessionToken } from "@/lib/auth/session";
 import { findCredentialsByEmail, logActivity } from "@/lib/db/users";
+import { getMessages } from "@/i18n/server";
+import { getClientIp, rateLimit } from "@/lib/rate-limit";
 import { signInSchema } from "@/lib/validation/auth";
 
 /**
@@ -13,27 +16,31 @@ import { signInSchema } from "@/lib/validation/auth";
  * Body: { email: string, password: string }
  */
 export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
-  }
+  const t = getMessages();
 
+  // Throttle by IP: 10 attempts per minute.
+  const limit = rateLimit(`login:${getClientIp(request)}`, { limit: 10, windowMs: 60_000 });
+  if (!limit.ok) return tooManyRequests(limit.retryAfterSeconds);
+
+  const body = await readJson(request);
+  if (body === null) return badRequest(t.api.invalidJson);
   const parsed = signInSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 400 });
+    return NextResponse.json(
+      { error: t.api.invalidCredentials, fieldErrors: zodFieldErrors(parsed.error) },
+      { status: 400 },
+    );
   }
 
   const credentials = await findCredentialsByEmail(parsed.data.email);
   if (!credentials) {
     // Same generic response whether the email exists or not.
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    return unauthorized(t.api.invalidCredentials);
   }
 
   const valid = await verifyPassword(parsed.data.password, credentials.passwordHash);
   if (!valid) {
-    return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
+    return unauthorized(t.api.invalidCredentials);
   }
 
   const { profile } = credentials;
@@ -60,3 +67,4 @@ export async function POST(request: Request) {
   });
   return response;
 }
+

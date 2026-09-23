@@ -1,5 +1,3 @@
-"use client";
-
 import { useFormState } from "react-dom";
 
 import { signUpAction } from "@/app/(auth)/actions";
@@ -7,18 +5,20 @@ import { initialActionState } from "@/lib/form-state";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { useMessages } from "@/i18n/provider";
 
 export function RegisterForm() {
+  const t = useMessages();
   const [state, formAction] = useFormState(signUpAction, initialActionState);
 
   if (state.status === "success") {
     return (
       <Alert variant="success">
-        {state.message ?? "Account created."} You can now{" "}
+        {state.message ?? t.auth.accountCreated} {t.auth.canNowSignInPrefix}{" "}
         <a href="/login" className="font-medium underline">
-          sign in
+          {t.auth.signInLink}
         </a>
-        .
+        {t.auth.canNowSignInSuffix}
       </Alert>
     );
   }
@@ -28,37 +28,37 @@ export function RegisterForm() {
       {state.status === "error" && state.message && <Alert variant="error">{state.message}</Alert>}
 
       <Input
-        label="Full name"
+        label={t.auth.fullNameLabel}
         name="fullName"
         type="text"
         autoComplete="name"
-        placeholder="Ada Lovelace"
+        placeholder={t.auth.fullNamePlaceholder}
         required
         error={state.fieldErrors?.fullName}
       />
 
       <Input
-        label="Email"
+        label={t.auth.emailLabel}
         name="email"
         type="email"
         autoComplete="email"
-        placeholder="you@example.com"
+        placeholder={t.auth.emailPlaceholder}
         required
         error={state.fieldErrors?.email}
       />
 
       <Input
-        label="Password"
+        label={t.auth.passwordLabel}
         name="password"
         type="password"
         autoComplete="new-password"
-        placeholder="••••••••"
+        placeholder={t.auth.passwordPlaceholder}
         required
-        hint="At least 8 characters, including a letter and a number."
+        hint={t.auth.passwordHint}
         error={state.fieldErrors?.password}
       />
 
-      <SubmitButton>Create account</SubmitButton>
+      <SubmitButton>{t.auth.createAccountButton}</SubmitButton>
     </form>
   );
 }

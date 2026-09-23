@@ -17,3 +17,19 @@ export type ActionState = {
 };
 
 export const initialActionState: ActionState = { status: "idle" };
+
+/**
+ * Convert a Zod error into the `fieldErrors` shape used by forms.
+ * Field paths with more than one segment are joined (e.g. `["a","b"]` → `"a.b"`).
+ */
+export function toFieldErrors(error: {
+  issues: { path: (string | number)[]; message: string }[];
+}): Record<string, string[]> {
+  const fieldErrors: Record<string, string[]> = {};
+  for (const issue of error.issues) {
+    const key = issue.path.length ? issue.path.join(".") : "_form";
+    (fieldErrors[key] ??= []).push(issue.message);
+  }
+  return fieldErrors;
+}
+

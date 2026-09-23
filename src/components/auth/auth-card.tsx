@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { getMessages } from "@/i18n/server";
+
 /** Shared layout wrapper for all auth screens. */
 export function AuthCard({
   title,
@@ -12,6 +14,8 @@ export function AuthCard({
   children: React.ReactNode;
   footer?: React.ReactNode;
 }) {
+  const t = getMessages();
+
   return (
     <main id="main" className="flex min-h-screen items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
@@ -20,7 +24,7 @@ export function AuthCard({
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">
               S
             </span>
-            SaaS Dashboard
+            {t.common.appName}
           </Link>
         </div>
 
@@ -35,3 +39,4 @@ export function AuthCard({
     </main>
   );
 }
+

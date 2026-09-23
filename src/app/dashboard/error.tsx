@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useMessages } from "@/i18n/provider";
 
 export default function DashboardError({
   error,
@@ -9,14 +10,14 @@ export default function DashboardError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useMessages();
+
   return (
     <div className="flex min-h-[40vh] flex-col items-center justify-center text-center">
-      <h2 className="text-lg font-semibold text-slate-900">Something went wrong</h2>
-      <p className="mt-1 max-w-md text-sm text-slate-500">
-        We couldn&apos;t load this page. Please try again.
-      </p>
+      <h2 className="text-lg font-semibold text-slate-900">{t.errors.genericTitle}</h2>
+      <p className="mt-1 max-w-md text-sm text-slate-500">{t.errors.dashboardMessage}</p>
       <Button className="mt-4" onClick={reset}>
-        Try again
+        {t.common.retry}
       </Button>
     </div>
   );

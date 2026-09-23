@@ -1,9 +1,11 @@
 import { AppHeader } from "@/components/dashboard/app-header";
 import { requireUser } from "@/lib/auth";
+import { getMessages } from "@/i18n/server";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // Server-side guard: redirects unauthenticated visitors to /login.
   const profile = await requireUser("/dashboard");
+  const t = getMessages();
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-50">
@@ -12,7 +14,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {children}
       </main>
       <footer className="border-t border-slate-200 px-4 py-6 text-center text-xs text-slate-400">
-        © {new Date().getFullYear()} SaaS Dashboard
+        {t.footer.rights(new Date().getFullYear())}
       </footer>
     </div>
   );

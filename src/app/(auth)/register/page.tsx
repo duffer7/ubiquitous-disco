@@ -3,19 +3,22 @@ import Link from "next/link";
 
 import { AuthCard } from "@/components/auth/auth-card";
 import { RegisterForm } from "@/components/auth/register-form";
+import { getMessages } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Create account" };
+const t = getMessages();
+
+export const metadata: Metadata = { title: t.metadata.register };
 
 export default function RegisterPage() {
   return (
     <AuthCard
-      title="Create your account"
-      subtitle="Get started in a few seconds."
+      title={t.auth.createAccountTitle}
+      subtitle={t.auth.createAccountSubtitle}
       footer={
         <>
-          Already have an account?{" "}
+          {t.auth.hasAccount}{" "}
           <Link href="/login" className="font-medium text-brand-600 hover:underline">
-            Sign in
+            {t.auth.signInLink}
           </Link>
         </>
       }

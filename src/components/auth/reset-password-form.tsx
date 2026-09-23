@@ -1,5 +1,3 @@
-"use client";
-
 import { useFormState } from "react-dom";
 
 import { resetPasswordAction } from "@/app/(auth)/actions";
@@ -7,8 +5,10 @@ import { initialActionState } from "@/lib/form-state";
 import { SubmitButton } from "@/components/auth/submit-button";
 import { Alert } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
+import { useMessages } from "@/i18n/provider";
 
 export function ResetPasswordForm({ token }: { token: string }) {
+  const t = useMessages();
   const [state, formAction] = useFormState(resetPasswordAction, initialActionState);
 
   return (
@@ -18,27 +18,27 @@ export function ResetPasswordForm({ token }: { token: string }) {
       <input type="hidden" name="token" value={token} />
 
       <Input
-        label="New password"
+        label={t.auth.newPasswordLabel}
         name="password"
         type="password"
         autoComplete="new-password"
-        placeholder="••••••••"
+        placeholder={t.auth.passwordPlaceholder}
         required
-        hint="At least 8 characters, including a letter and a number."
+        hint={t.auth.passwordHint}
         error={state.fieldErrors?.password}
       />
 
       <Input
-        label="Confirm new password"
+        label={t.auth.confirmPasswordLabel}
         name="confirmPassword"
         type="password"
         autoComplete="new-password"
-        placeholder="••••••••"
+        placeholder={t.auth.passwordPlaceholder}
         required
         error={state.fieldErrors?.confirmPassword}
       />
 
-      <SubmitButton>Update password</SubmitButton>
+      <SubmitButton>{t.auth.updatePassword}</SubmitButton>
     </form>
   );
 }

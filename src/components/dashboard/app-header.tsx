@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { signOutAction } from "@/app/(auth)/actions";
 import { initials } from "@/lib/utils";
+import { getMessages } from "@/i18n/server";
 import type { Profile } from "@/types/database.types";
 
 /**
@@ -9,6 +10,8 @@ import type { Profile } from "@/types/database.types";
  * a sign-out form (which posts to the signOutAction Server Action).
  */
 export function AppHeader({ profile }: { profile: Profile }) {
+  const t = getMessages();
+
   return (
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -17,7 +20,7 @@ export function AppHeader({ profile }: { profile: Profile }) {
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white">
               S
             </span>
-            <span className="hidden sm:inline">SaaS Dashboard</span>
+            <span className="hidden sm:inline">{t.common.appName}</span>
           </Link>
 
           <nav className="flex items-center gap-1 text-sm">
@@ -25,20 +28,26 @@ export function AppHeader({ profile }: { profile: Profile }) {
               href="/dashboard"
               className="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
-              Dashboard
+              {t.nav.dashboard}
+            </Link>
+            <Link
+              href="/dashboard/activity"
+              className="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+            >
+              {t.nav.activity}
             </Link>
             <Link
               href="/dashboard/profile"
               className="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
             >
-              Profile
+              {t.nav.profile}
             </Link>
             {profile.role === "admin" && (
               <Link
                 href="/admin"
                 className="rounded-md px-3 py-2 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               >
-                Admin
+                {t.nav.admin}
               </Link>
             )}
           </nav>
@@ -49,7 +58,9 @@ export function AppHeader({ profile }: { profile: Profile }) {
             <p className="text-sm font-medium text-slate-900">
               {profile.full_name || profile.email}
             </p>
-            <p className="text-xs capitalize text-slate-500">{profile.role}</p>
+            <p className="text-xs capitalize text-slate-500">
+              {profile.role === "admin" ? t.roles.admin : t.roles.client}
+            </p>
           </div>
           <span
             aria-hidden
@@ -59,7 +70,7 @@ export function AppHeader({ profile }: { profile: Profile }) {
           </span>
           <form action={signOutAction}>
             <button type="submit" className="btn-secondary">
-              Sign out
+              {t.nav.signOut}
             </button>
           </form>
         </div>

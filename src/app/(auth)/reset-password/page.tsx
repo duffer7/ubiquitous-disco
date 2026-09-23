@@ -3,8 +3,11 @@ import Link from "next/link";
 
 import { AuthCard } from "@/components/auth/auth-card";
 import { ResetPasswordForm } from "@/components/auth/reset-password-form";
+import { getMessages } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Set a new password" };
+const t = getMessages();
+
+export const metadata: Metadata = { title: t.metadata.resetPassword };
 
 /**
  * Reached via the password-recovery link, which contains a single-use token:
@@ -22,20 +25,20 @@ export default function ResetPasswordPage({
   if (!token) {
     return (
       <AuthCard
-        title="Reset link required"
-        subtitle="This page needs a valid reset link."
+        title={t.auth.resetLinkRequiredTitle}
+        subtitle={t.auth.resetLinkRequiredSubtitle}
         footer={
           <Link href="/login" className="font-medium text-brand-600 hover:underline">
-            Back to sign in
+            {t.auth.backToSignIn}
           </Link>
         }
       >
         <p className="text-sm text-slate-600">
-          Open the reset link from your email, or{" "}
+          {t.auth.resetLinkRequiredBodyStart}{" "}
           <Link href="/forgot-password" className="font-medium text-brand-600 hover:underline">
-            request a new one
+            {t.auth.requestNewLink}
           </Link>
-          .
+          {t.auth.resetLinkRequiredBodyEnd}
         </p>
       </AuthCard>
     );
@@ -43,11 +46,11 @@ export default function ResetPasswordPage({
 
   return (
     <AuthCard
-      title="Set a new password"
-      subtitle="Choose a strong password you haven't used before."
+      title={t.auth.resetTitle}
+      subtitle={t.auth.resetSubtitle}
       footer={
         <Link href="/login" className="font-medium text-brand-600 hover:underline">
-          Back to sign in
+          {t.auth.backToSignIn}
         </Link>
       }
     >

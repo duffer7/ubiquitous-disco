@@ -41,3 +41,40 @@ export interface PasswordResetToken {
   used_at: string | null;
   created_at: string;
 }
+
+// ---------------------------------------------------------------------------
+// Aggregate / derived types (admin panel)
+// ---------------------------------------------------------------------------
+
+/** A profile row joined with its activity count (used in the admin list). */
+export interface UserListItem extends Profile {
+  activity_count: number;
+  last_active_at: string | null;
+}
+
+export type UserSort = "created_at" | "email" | "full_name" | "role";
+
+export interface UserListQuery {
+  search?: string;
+  role?: UserRole;
+  sort?: UserSort;
+  direction?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
+export interface UserListResult {
+  items: UserListItem[];
+  total: number;
+}
+
+/** Aggregate statistics shown at the top of the admin dashboard. */
+export interface UserStats {
+  total: number;
+  admins: number;
+  clients: number;
+  newLast7Days: number;
+  newLast30Days: number;
+  activeLast7Days: number;
+}
+

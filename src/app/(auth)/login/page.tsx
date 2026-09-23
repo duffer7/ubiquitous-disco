@@ -3,8 +3,12 @@ import Link from "next/link";
 
 import { AuthCard } from "@/components/auth/auth-card";
 import { LoginForm } from "@/components/auth/login-form";
+import { getMessages } from "@/i18n/server";
 
-export const metadata: Metadata = { title: "Sign in" };
+
+const t = getMessages();
+
+export const metadata: Metadata = { title: t.metadata.signIn };
 
 export default function LoginPage({
   searchParams,
@@ -13,13 +17,17 @@ export default function LoginPage({
 }) {
   return (
     <AuthCard
-      title="Welcome back"
-      subtitle="Sign in to access your dashboard."
+
+
+      title={t.auth.welcomeBackTitle}
+      subtitle={t.auth.welcomeBackSubtitle}
       footer={
         <>
-          Don&apos;t have an account?{" "}
+
+          {t.auth.noAccount}{" "}
           <Link href="/register" className="font-medium text-brand-600 hover:underline">
-            Create one
+
+            {t.auth.createOne}
           </Link>
         </>
       }
@@ -27,7 +35,8 @@ export default function LoginPage({
       {searchParams.error && (
         <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {searchParams.error === "auth_callback_failed"
-            ? "We couldn't verify that link. Please try signing in again."
+
+            ? t.auth.authCallbackFailed
             : searchParams.error}
         </p>
       )}

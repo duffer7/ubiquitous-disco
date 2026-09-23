@@ -6,29 +6,32 @@
  */
 import { z } from "zod";
 
+import { getMessages } from "@/i18n/server";
+
+const v = getMessages().validation;
+
 export const emailSchema = z
   .string()
-  .min(1, "Email is required")
-  .email("Enter a valid email address")
-  .transform((v) => v.trim().toLowerCase());
+  .min(1, v.emailRequired)
+  .transform((v) => v.trim().toLowerCase())
+  .pipe(z.string().email(v.emailInvalid));
 
 export const passwordSchema = z
   .string()
-  .min(8, "Password must be at least 8 characters")
-  .max(72, "Password must be at most 72 characters")
-  .regex(/[a-zA-Z]/, "Password must contain at least one letter")
-  .regex(/[0-9]/, "Password must contain at least one number");
-
+  .min(8, v.passwordMin)
+  .max(72, v.passwordMax)
+  .regex(/[a-zA-Z]/, v.passwordLetter)
+  .regex(/[0-9]/, v.passwordNumber);
 export const signInSchema = z.object({
   email: emailSchema,
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, v.passwordRequired),
 });
 
 export const signUpSchema = z.object({
   fullName: z
     .string()
-    .min(2, "Please enter your full name")
-    .max(120, "Name is too long")
+    .min(2, v.fullNameMin)
+    .max(120, v.fullNameMax)
     .transform((v) => v.trim()),
   email: emailSchema,
   password: passwordSchema,
@@ -44,7 +47,7 @@ export const resetPasswordSchema = z
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: v.passwordsDoNotMatch,
     path: ["confirmPassword"],
   });
 
@@ -52,3 +55,4 @@ export type SignInInput = z.infer<typeof signInSchema>;
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
+

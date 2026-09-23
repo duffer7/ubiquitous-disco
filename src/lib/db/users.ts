@@ -16,6 +16,12 @@ export interface UserCredentials {
   passwordHash: string;
 }
 
+/** Profile fields that a client may edit on their own account. */
+export type ProfileSelfEditable = Pick<Profile, "full_name" | "company" | "phone" | "avatar_url">;
+
+/** Extra profile fields an administrator may additionally edit. */
+export type ProfileAdminEditable = ProfileSelfEditable & Pick<Profile, "email" | "role">;
+
 const PROFILE_COLUMNS = `
   id, email, full_name, company, avatar_url, role, phone, created_at, updated_at
 `;
@@ -29,6 +35,17 @@ export async function findProfileByEmail(email: string): Promise<Profile | null>
     `select ${PROFILE_COLUMNS} from profiles where lower(email) = lower($1)`,
     [email],
   );
+}
+
+/** Whether an email is already used by a *different* profile. */
+export async function isEmailTaken(email: string, excludingId?: string): Promise<boolean> {
+  const row = await queryOne<{ id: string }>(
+    `select id from profiles
+     where lower(email) = lower($1)
+       and ($2::uuid is null or id <> $2::uuid)`,
+    [email, excludingId ?? null],
+  );
+  return row !== null;
 }
 
 /** Fetch a profile together with its password hash (for sign-in). */
@@ -63,7 +80,7 @@ export async function createProfile(input: {
 
 export async function updateProfile(
   id: string,
-  patch: Partial<Pick<Profile, "full_name" | "company" | "phone" | "avatar_url" | "role">>,
+  patch: Partial<ProfileAdminEditable>,
 ): Promise<Profile | null> {
   const fields = Object.entries(patch).filter(([, v]) => v !== undefined);
   if (fields.length === 0) {
@@ -104,3 +121,4 @@ export async function logActivity(
     JSON.stringify(metadata),
   ]);
 }
+
